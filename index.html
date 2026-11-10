@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cyber Console V5</title>
+<style>
+:root{--neon:#00ff70;--panel:#06140c}
+body.blue{--neon:#00cfff;--panel:#06121b}
+*{box-sizing:border-box}
+body{margin:0;background:#020704;color:var(--neon);font-family:monospace}
+#matrix{position:fixed;inset:0;width:100%;height:100%;z-index:-1;opacity:.3}
+header{text-align:center;padding:20px;border-bottom:1px solid var(--neon);background:#020704dd}
+h1{letter-spacing:3px;text-shadow:0 0 15px var(--neon)}
+main{max-width:900px;margin:auto;padding:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.panel{background:var(--panel);border:1px solid var(--neon);padding:15px;box-shadow:0 0 12px #00ff6622}
+h3{color:var(--neon)}
+.value{font-size:25px;color:white;margin:18px 0}
+button{background:var(--neon);color:#001b09;border:0;padding:12px;margin:5px;font-weight:bold}
+input{width:100%;padding:12px;background:#000;color:var(--neon);border:1px solid var(--neon);margin:5px 0}
+canvas.chart{width:100%;height:150px;background:#000}
+#terminal{height:190px;background:#000;padding:12px;overflow:auto;line-height:1.7;overflow-wrap:anywhere}
+footer{text-align:center;padding:25px;color:#668b70}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+
+<header>
+<h1>CYBER CONSOLE V5</h1>
+<p>PRO SECURITY DASHBOARD</p>
+<div id="clock"></div>
+</header>
+
+<main>
+<div class="grid">
+<section class="panel">
+<h3>NETWORK STATUS</h3>
+<div class="value">● ONLINE</div>
+<p>Local demo interface</p>
+</section>
+
+<section class="panel">
+<h3>SECURITY STATUS</h3>
+<div class="value">PROTECTED</div>
+<p>Educational simulation</p>
+</section>
+
+<section class="panel">
+<h3>CPU ACTIVITY</h3>
+<div class="value" id="cpu">35%</div>
+<canvas class="chart" id="graph" width="500" height="150"></canvas>
+</section>
+
+<section class="panel">
+<h3>WORLD NETWORK MAP</h3>
+<canvas class="chart" id="map" width="500" height="150"></canvas>
+<p>Illustrative network animation</p>
+</section>
+
+<section class="panel">
+<h3>CYBER TOOLS</h3>
+<button onclick="scan()">START DEMO SCAN</button>
+<button onclick="changeTheme()">CHANGE THEME</button>
+<button onclick="sound()">SOUND TEST</button>
+<button onclick="clearLog()">CLEAR TERMINAL</button>
+</section>
+
+<section class="panel">
+<h3>SMART TERMINAL</h3>
+<div id="terminal">&gt; Cyber Console V5 initialized<br>&gt; Type help for commands</div>
+<input id="cmd" placeholder="Enter command and press Enter">
+</section>
+
+<section class="panel">
+<h3>SYSTEM INFORMATION</h3>
+<p>Version: V5.0</p>
+<p>Mode: DEMO</p>
+<p>Interface: MOBILE</p>
+<p>Network: SIMULATED</p>
+</section>
+</div>
+</main>
+
+<footer>CYBER CONSOLE V5 | EDUCATIONAL DEMO ONLY</footer>
+
+<script>
+const terminal=document.getElementById("terminal");
+
+function log(message){
+const line=document.createElement("div");
+line.textContent="> "+message;
+terminal.appendChild(line);
+terminal.scrollTop=terminal.scrollHeight;
+}
+
+function clearLog(){
+terminal.textContent="> Terminal cleared.";
+}
+
+function scan(){
+log("Starting simulated security scan...");
+setTimeout(()=>log("Checking demo dashboard..."),700);
+setTimeout(()=>log("No real network scan performed."),1400);
+setTimeout(()=>log("Demo scan completed."),2100);
+}
+
+function changeTheme(){
+document.body.classList.toggle("blue");
+log("Dashboard theme changed.");
+}
+
+function sound(){
+try{
+const a=new AudioContext();
+const o=a.createOscillator();
+const g=a.createGain();
+o.connect(g);g.connect(a.destination);
+o.frequency.value=650;
+g.gain.value=.04;
+o.start();
+o.stop(a.currentTime+.2);
+}catch(e){log("Audio unavailable");}
+}
+
+function updateClock(){
+document.getElementById("clock").textContent=new Date().toLocaleString();
+}
+setInterval(updateClock,1000);
+updateClock();
+
+document.getElementById("cmd").addEventListener("keydown",e=>{
+if(e.key!=="Enter")return;
+const command=e.target.value.trim().toLowerCase();
+if(command==="help"){
+log("Commands: help, status, scan, clear, theme, time");
+}else if(command==="status"){
+log("System online. Simulation mode active.");
+}else if(command==="scan"){
+scan();
+}else if(command==="clear"){
+clearLog();
+}else if(command==="theme"){
+changeTheme();
+}else if(command==="time"){
+log(new Date().toLocaleString());
+}else{
+log("Unknown command. Type help.");
+}
+e.target.value="";
+});
+
+// Matrix animation
+const matrix=document.getElementById("matrix");
+const ctx=matrix.getContext("2d");
+let drops=[],fontSize=14;
+
+function resizeMatrix(){
+matrix.width=innerWidth;
+matrix.height=innerHeight;
+drops=Array(Math.ceil(matrix.width/fontSize)).fill(1);
+}
+resizeMatrix();
+addEventListener("resize",resizeMatrix);
+
+function drawMatrix(){
+ctx.fillStyle="rgba(0,0,0,0.08)";
+ctx.fillRect(0,0,matrix.width,matrix.height);
+ctx.fillStyle=getComputedStyle(document.body).getPropertyValue("--neon");
+ctx.font=fontSize+"px monospace";
+drops.forEach((y,i)=>{
+ctx.fillText(String.fromCharCode(0x30A0+Math.random()*96),i*fontSize,y*fontSize);
+if(y*fontSize>matrix.height&&Math.random()>.975)drops[i]=0;
+drops[i]++;
+});
+}
+setInterval(drawMatrix,55);
+
+// CPU graph simulation
+const graph=document.getElementById("graph");
+const g=graph.getContext("2d");
+let values=Array.from({length:45},()=>Math.random()*100);
+
+function drawGraph(){
+g.clearRect(0,0,500,150);
+g.strokeStyle=getComputedStyle(document.body).getPropertyValue("--neon");
+g.beginPath();
+values.forEach((v,i)=>{
+let x=i*11.3,y=145-v;
+if(i===0)g.moveTo(x,y);else g.lineTo(x,y);
+});
+g.stroke();
+values.shift();
+values.push(Math.random()*100);
+document.getElementById("cpu").textContent=Math.round(values[44])+"%";
+}
+setInterval(drawGraph,500);
+drawGraph();
+
+// Animated illustrative network map
+const map=document.getElementById("map");
+const m=map.getContext("2d");
+let nodes=Array.from({length:20},()=>({
+x:Math.random()*500,y:Math.random()*150
+}));
+
+function drawMap(){
+m.clearRect(0,0,500,150);
+nodes.forEach((p,i)=>{
+nodes.slice(i+1).forEach(q=>{
+if(Math.hypot(p.x-q.x,p.y-q.y)<120){
+m.strokeStyle="#087d38";
+m.beginPath();
+m.moveTo(p.x,p.y);
+m.lineTo(q.x,q.y);
+m.stroke();
+}
+});
+m.fillStyle=getComputedStyle(document.body).getPropertyValue("--neon");
+m.beginPath();
+m.arc(p.x,p.y,3,0,Math.PI*2);
+m.fill();
+});
+}
+setInterval(drawMap,500);
+</script>
+</body>
+</html>
